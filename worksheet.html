@@ -25,6 +25,7 @@
       padding: 15px 20px;
       margin-bottom: 20px;
       transition: box-shadow 0.3s ease;
+      position: relative;
     }
     .worksheet-card:hover {
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -43,15 +44,48 @@
     select.status-select:hover {
       border-color: #888;
     }
+    /* Törlés gomb stílus */
+    button.delete-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button.delete-btn:hover {
+      background-color: #c0392b;
+    }
+    .my-4 {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    button.back-btn {
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button.back-btn:hover {
+      background-color: #c0392b;
+    }
   </style>
 </head>
 <body>
   <h2>Munkalapok listája</h2>
   <div id="worksheetsContainer">Betöltés...</div>
   <div class="my-4">
-  <button onclick="location.href='rami.html'" class="bg-red-700 text-white px-4 py-2 rounded">Vissza</button>
-</div>
-
+    <button onclick="location.href='rami.html'" class="back-btn">Vissza</button>
+  </div>
 
   <!-- Firebase App (the core Firebase SDK) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -62,11 +96,11 @@
     // --- Firebase konfiguráció (ide a sajátodat másold) ---
     const firebaseConfig = {
       apiKey: "AIzaSyBlDTpa3kV6-QFO-toYRO6DiS5-88WAwQk",
-    authDomain: "eger-kezelo.firebaseapp.com",
-    projectId: "eger-kezelo",
-    storageBucket: "eger-kezelo.firebasestorage.app",
-    messagingSenderId: "1076613883619",
-    appId: "1:1076613883619:web:64b94cca3880a89da987d6"
+      authDomain: "eger-kezelo.firebaseapp.com",
+      projectId: "eger-kezelo",
+      storageBucket: "eger-kezelo.firebasestorage.app",
+      messagingSenderId: "1076613883619",
+      appId: "1:1076613883619:web:64b94cca3880a89da987d6"
     };
 
     // Firebase inicializálás
@@ -115,6 +149,7 @@
                 ).join('')}
               </select>
             </p>
+            <button class="delete-btn" data-id="${id}">Törlés</button>
           `;
 
           worksheetsContainer.appendChild(card);
@@ -130,6 +165,21 @@
               alert("Státusz frissítve!");
             } catch (error) {
               alert("Hiba történt a státusz frissítésekor: " + error.message);
+            }
+          });
+        });
+
+        // Eseménykezelők a törléshez
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const docId = e.target.getAttribute("data-id");
+            if (confirm("Biztosan törölni szeretnéd ezt a munkalapot?")) {
+              try {
+                await db.collection("worksheets").doc(docId).delete();
+                alert("Munkalap törölve.");
+              } catch (error) {
+                alert("Hiba történt a törlés során: " + error.message);
+              }
             }
           });
         });
