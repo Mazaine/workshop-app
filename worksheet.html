@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Munkalapok listája - Státusz kezelő</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 15px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #222;
+    }
+    .worksheet-card {
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      transition: box-shadow 0.3s ease;
+    }
+    .worksheet-card:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .worksheet-card p {
+      margin: 8px 0;
+    }
+    select.status-select {
+      padding: 5px 8px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+    select.status-select:hover {
+      border-color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h2>Munkalapok listája</h2>
+  <div id="worksheetsContainer">Betöltés...</div>
+  <div class="my-4">
+  <button onclick="location.href='rami.html'" class="bg-red-700 text-white px-4 py-2 rounded">Vissza</button>
+</div>
+
+
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // --- Firebase konfiguráció (ide a sajátodat másold) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlDTpa3kV6-QFO-toYRO6DiS5-88WAwQk",
+    authDomain: "eger-kezelo.firebaseapp.com",
+    projectId: "eger-kezelo",
+    storageBucket: "eger-kezelo.firebasestorage.app",
+    messagingSenderId: "1076613883619",
+    appId: "1:1076613883619:web:64b94cca3880a89da987d6"
+    };
+
+    // Firebase inicializálás
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const worksheetsContainer = document.getElementById('worksheetsContainer');
+
+    const statusOptions = [
+      "Szállítás alatt",
+      "Átvettem",
+      "Javítva",
+      "Fizetve",
+      "Elküldve"
+    ];
+
+    function loadWorksheets() {
+      worksheetsContainer.innerHTML = "Betöltés...";
+
+      db.collection("worksheets").onSnapshot(snapshot => {
+        worksheetsContainer.innerHTML = "";
+        if (snapshot.empty) {
+          worksheetsContainer.innerHTML = "<p>Nincsenek mentett munkalapok.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const id = doc.id;
+
+          // Kártya létrehozása
+          const card = document.createElement('div');
+          card.className = "worksheet-card";
+
+          card.innerHTML = `
+            <p><strong>Prohardver Név:</strong> ${data.customerName || "-"}</p>
+            <p><strong>Hibaleírás:</strong> ${data.errorReason || "-"}</p>
+            <p><strong>Eszköz:</strong> ${data.deviceToRepair || "-"}</p>
+            <p><strong>Kapcsolat:</strong> ${data.contactInfo || "-"}</p>
+            <p><strong>Megjegyzés:</strong> ${data.comment || "-"}</p>
+            <p><strong>Javítás dátuma:</strong> ${data.repairDate || "-"}</p>
+            <p><strong>Státusz:</strong>
+              <select data-id="${id}" class="status-select">
+                ${statusOptions.map(opt => 
+                  `<option value="${opt}" ${opt === data.status ? "selected" : ""}>${opt}</option>`
+                ).join('')}
+              </select>
+            </p>
+          `;
+
+          worksheetsContainer.appendChild(card);
+        });
+
+        // Eseménykezelők a státuszváltoztatáshoz
+        document.querySelectorAll(".status-select").forEach(select => {
+          select.addEventListener("change", async (e) => {
+            const newStatus = e.target.value;
+            const docId = e.target.getAttribute("data-id");
+            try {
+              await db.collection("worksheets").doc(docId).update({ status: newStatus });
+              alert("Státusz frissítve!");
+            } catch (error) {
+              alert("Hiba történt a státusz frissítésekor: " + error.message);
+            }
+          });
+        });
+      }, error => {
+        worksheetsContainer.innerHTML = `<p>Hiba történt az adatok betöltésekor: ${error.message}</p>`;
+      });
+    }
+
+    // Betöltés indítása
+    loadWorksheets();
+  </script>
+</body>
+</html>
