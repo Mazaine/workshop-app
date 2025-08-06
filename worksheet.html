@@ -137,7 +137,10 @@
 
           card.innerHTML = `
             <p><strong>Prohardver Név:</strong> ${data.customerName || "-"}</p>
-            <p><strong>Hibaleírás:</strong> ${data.errorReason || "-"}</p>
+           <p><strong>Név:</strong> ${data.simpleCustomerName || ''}</p>
+
+
+            <p><strong>Hiba leírás:</strong> ${data.errorReason || "-"}</p>
             <p><strong>Eszköz:</strong> ${data.deviceToRepair || "-"}</p>
             <p><strong>Kapcsolat:</strong> ${data.contactInfo || "-"}</p>
             <p><strong>Megjegyzés:</strong> ${data.comment || "-"}</p>
