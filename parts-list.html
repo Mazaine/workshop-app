@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alkatrész lista</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <script src="../js/navbar.js"></script>
+
+  <div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold mb-6 text-gray-800">Alkatrész lista</h2>
+
+    <div class="bg-white rounded-lg shadow-md overflow-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Név</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Típus</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Egységár</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Készlet</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Műveletek</th>
+          </tr>
+        </thead>
+        <tbody id="parts-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+      </table>
+    </div>
+  </div>
+
+  
+  <script type="module" src="../js/parts-list.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Munkalap generálása</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <script src="../js/navbar.js"></script>
+
+  <div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold mb-6 text-gray-800">Munkalap generálása</h2>
+
+    <form id="workorder-form" class="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Hibaleírás</label>
+          <textarea id="issue-description" required class="w-full mt-1 p-2 border rounded h-24"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Prohardver név</label>
+          <input id="customer-name" required class="w-full mt-1 p-2 border rounded" />
+          <label class="block text-sm font-medium text-gray-700 mt-4">Név</label>
+          <input id="name" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Elérhetőség</label>
+          <input id="contact" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Javítandó eszköz</label>
+          <input id="device" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Munkadíj (Ft)</label>
+          <input id="labor-cost" type="number" min="0" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Szervízdíj (Ft)</label>
+          <input id="service-fee" type="number" min="0" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Dátum</label>
+          <input id="date" type="date" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Megjegyzés</label>
+        <textarea id="notes" class="w-full mt-1 p-2 border rounded h-20"></textarea>
+      </div>
+
+     <div>
+  <label class="block text-sm font-medium text-gray-700 mb-2">Felhasznált alkatrészek</label>
+  <div id="parts-selection-container" class="space-y-2 max-w-2xl">
+    <div class="flex items-center space-x-2">
+      <select id="part-select" class="flex-grow p-2 border rounded">
+        <option value="" disabled selected>Válassz alkatrészt</option>
+      </select>
+
+      <div class="flex items-center space-x-1">
+        <button type="button" id="qty-decrease" class="px-2 py-1 bg-gray-200 rounded">-</button>
+        <input type="number" id="part-quantity" min="1" value="1" class="w-20 p-2 border rounded text-center" />
+        <button type="button" id="qty-increase" class="px-2 py-1 bg-gray-200 rounded">+</button>
+      </div>
+
+      <button type="button" id="add-part-btn" class="px-3 py-2 bg-green-500 text-white rounded">Hozzáadás</button>
+    </div>
+  </div>
+
+    <!-- Itt jelennek meg a hozzáadott alkatrészek -->
+  <div id="selected-parts-list" class="mt-4 max-w-2xl"></div>
+</div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Munkalap generálása</button>
+    </form>
+  </div>
+
+  <script type="module" src="../js/create-workorder.js"></script>
+</body>
+</html>

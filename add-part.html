@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Alkatrész hozzáadása</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body class="bg-gray-50">
+    <script src="js/navbar.js"></script>
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Alkatrész hozzáadása</h2>
+        <form id="add-part-form" class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto space-y-4">
+            <input type="text" id="part-name" placeholder="Alkatrész neve" class="w-full border p-2" required>
+            <select id="part-type" class="w-full border p-2" required>
+                 <option value="" disabled selected>Válassz</option>
+                    <option value="mikrokapcsolo_3pin">Mikrokapcsoló 3 pin</option>
+                    <option value="mikrokapcsolo_2pin_moddolhato">Mikrokapcsoló 2 pin - 7.3mm-ből moddolható 5.2mm és 9.2mm is!</option>
+                    <option value="smd_mikrokapcsolo_2pin">SMD mikrokapcsoló 2 pin (pl. oldalsó gombra)</option>
+                    <option value="smd_mikrokapcsolo_4pin">SMD mikrokapcsoló 4 pin</option>
+                    <option value="eger_talp_univerzalis_ptfe">Egértalp, univerzális - tömör PTFE, lekerekített szélű</option>
+                    <option value="eger_talp_meretre_vagott_ptfe">Egértalp, méretre vágott - tömör PTFE, lekerekített szélű</option>
+                    <option value="gorgo_encoder">Görgő, Encoder (mindegyik magasítható alátéttel + 0,5 / 1 / 1,5mm-rel!)</option>
+                    <option value="parakabel_550">Parakábel 550, univerzális - Kérhető JST PH 2.0, Micro USB és Type-C csatlakozóval is!</option>
+                    <option value="usb_atalakito">USB átalakító</option>
+                    <option value="wireless">Wireless</option>
+                    <option value="akkumulator">Akkumulátor - BÁRMILYEN csatlakozóval kérhető!</option>
+                    <option value="grip_univerzalis_diy">Grip - univerzális, DIY</option>
+                    <option value="billentyuzet_alkatreszek">Billentyűzet alkatrészek</option>
+                    <option value="kontroller_alkatreszek">Kontroller alkatrészek</option>
+                    <option value="Tartozék">Egyéb</option>
+            </select>
+            <input type="number" id="part-price" placeholder="Egységár (Ft)" class="w-full border p-2" required>
+            <input type="number" id="part-quantity" placeholder="Készletszám" class="w-full border p-2" required>
+            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Mentés</button>
+        </form>
+    </div>
+
+<script type="module" src="js/add-part.js"></script>
+</body>
+</html>

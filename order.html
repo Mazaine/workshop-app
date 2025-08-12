@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rendelés oldal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <script src="js/navbar.js"></script>
+
+   <h2 class="text-3xl font-bold mb-6 text-gray-800">Rendelések</h2>
+
+  <form id="order-form" class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto space-y-4">
+    <label for="proharder-name" class="block text-sm font-medium text-gray-700">Proharder név:</label><br />
+    <input type="text" id="proharder-name" name="proharder-name" required  class="w-full border p-2" /><br />
+
+    <label for="issue-description" class="block text-sm font-medium text-gray-700">Hibaleírás:</label><br />
+    <textarea id="issue-description" name="issue-description" rows="5" class="w-full mt-1 p-2 border rounded h-20" required></textarea><br />
+
+    <label for="device" class="block text-sm font-medium text-gray-700">Javítandó eszköz:</label><br />
+    <input type="text" id="device" name="device" class="w-full border p-2" required /><br />
+
+    <label for="date" class="block text-sm font-medium text-gray-700">Dátum:</label><br />
+    <input type="date" id="date" name="date" class="w-full mt-1 p-2 border rounded"required /><br />
+
+    <label for="notes" class="block text-sm font-medium text-gray-700">Megjegyzés:</label><br />
+    <textarea id="notes" name="notes" rows="2" class="w-full mt-1 p-2 border rounded h-20"></textarea><br />
+
+    <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Rendelés Rögzitése</button>
+  </form>
+
+  <h2 class="text-3xl font-bold mb-6 text-gray-800">Rögzitett rendeléseid</h2>
+  <div id="order-cards-container"></div>
+
+  <script type="module" src="js/order.js"></script>
+</body>
+</html>
