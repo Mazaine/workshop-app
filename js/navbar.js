@@ -7,7 +7,8 @@ document.write(`
     <!-- Jobb oldal: menü és hamburger külön flexben -->
     <div class="flex items-center space-x-2">
       <!-- Hamburger ikon mobilra -->
-      <button id="menu-toggle" class=" ml-auto md:hidden text-3xl focus:outline-none">☰</button>
+      <button id="menu-toggle" class="absolute right-4 top-3 md:hidden text-3xl focus:outline-none">☰</button>
+
 
       <!-- Menü gombok desktopon -->
       <div id="menu-links" class="hidden md:flex md:space-x-4">
