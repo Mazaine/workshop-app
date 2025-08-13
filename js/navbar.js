@@ -4,19 +4,19 @@ document.write(`
     <!-- Bal oldal: logó -->
     <h1 class="text-2xl font-bold">Egér Alkatrész Kezelő</h1>
 
-    <!-- Jobb oldal: menü + hamburger -->
-    <div class="flex items-center">
+    <!-- Jobb oldal: menü és hamburger külön flexben -->
+    <div class="flex items-center space-x-2">
+      <!-- Hamburger ikon mobilra -->
+      <button id="menu-toggle" class="block md:hidden text-3xl focus:outline-none">☰</button>
+
       <!-- Menü gombok desktopon -->
-      <div id="menu-links" class="hidden md:flex md:space-x-4 flex-col md:flex-row">
+      <div id="menu-links" class="hidden md:flex md:space-x-4">
         <button onclick="window.location.href='add-part.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Alkatrész hozzáadása</button>
         <button onclick="window.location.href='parts-list.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Alkatrész lista</button>
         <button onclick="window.location.href='order.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Rendelések</button>
         <button onclick="window.location.href='create-workorder.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Munkalap generálása</button>
         <button onclick="window.location.href='workorders-list.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Munkalapok</button>
       </div>
-
-      <!-- Hamburger ikon mobilra -->
-      <button id="menu-toggle" class="block md:hidden ml-2 text-3xl focus:outline-none">☰</button>
     </div>
   </div>
 
