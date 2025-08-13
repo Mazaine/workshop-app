@@ -57,4 +57,21 @@ async function loadWorkOrders() {
   }
 }
 
+ document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.target.getAttribute('data-id');
+        if (confirm('Biztosan törlöd ezt a munkalapot?')) {
+          await deleteDoc(doc(firestore, 'workOrders', id));
+          alert('Törölve!');
+          loadWorkOrders(); // újratöltés törlés után
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('Hiba a munkalapok betöltésekor:', error);
+    container.innerHTML = '<p class="text-red-600">Hiba történt az adatok betöltésekor.</p>';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', loadWorkOrders);
