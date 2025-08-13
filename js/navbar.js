@@ -4,10 +4,11 @@ document.write(`
         <h1 class="text-2xl font-bold">Egér Alkatrész Kezelő</h1>
         
         <div class="flex items-center">
-            <!-- Hamburger ikon mobilra -->
-            <button id="menu-toggle" class="block md:hidden focus:outline-none text-3xl ml-4">
-                ☰
-            </button>
+      
+    <!-- Hamburger ikon mobilra -->
+    <button id="menu-toggle" class="block md:hidden focus:outline-none text-3xl">
+      ☰
+    </button>
 
             <!-- Menü gombok -->
             <div id="menu-links" class="overflow-hidden max-h-0 md:max-h-none transition-all duration-500 ease-in-out md:flex md:space-x-4 flex-col md:flex-row mt-4 md:mt-0 ml-4">
