@@ -45,6 +45,8 @@ async function loadWorkOrders() {
             <p class="text-lg font-bold text-blue-600 mt-1"><span class="font-semibold">Összesen:</span> ${o.total || 0} Ft</p>
           </div>
           ${o.notes ? `<p class="mt-2 text-gray-600"><span class="font-semibold">Megjegyzés:</span> ${o.notes}</p>` : ''}
+ <button data-id="${docId}" class="delete-btn mt-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Törlés</button>
+        </div>
         </div>
       `;
 
