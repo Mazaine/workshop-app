@@ -6,7 +6,7 @@ document.write(`
         <div class="flex items-center">
       
     <!-- Hamburger ikon mobilra -->
-    <button id="menu-toggle" class="block md:hidden focus:outline-none text-3xl flex items-center"">
+    <button id="menu-toggle" class="block md:hidden focus:outline-none text-3xl flex items-center">
       ☰
     </button>
 
