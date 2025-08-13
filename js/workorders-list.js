@@ -1,13 +1,13 @@
 // js/workorders-list.js
 import { firestore } from './firebase.js';
-import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { collection, getDocs, query, orderBy, deleteDoc, doc } 
+  from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 async function loadWorkOrders() {
   const container = document.getElementById('workorders-container');
   if (!container) return;
 
   try {
-    // Lekérjük a 'workOrders' gyűjteményt dátum szerint növekvő sorrendben
     const q = query(collection(firestore, 'workOrders'), orderBy('createdAt'));
     const querySnapshot = await getDocs(q);
 
@@ -15,6 +15,7 @@ async function loadWorkOrders() {
 
     querySnapshot.forEach(docSnap => {
       const o = docSnap.data();
+      const docId = docSnap.id; // dokumentum azonosító
 
       const card = document.createElement('div');
       card.className = 'bg-white rounded-lg shadow-md overflow-hidden';
@@ -45,21 +46,15 @@ async function loadWorkOrders() {
             <p class="text-lg font-bold text-blue-600 mt-1"><span class="font-semibold">Összesen:</span> ${o.total || 0} Ft</p>
           </div>
           ${o.notes ? `<p class="mt-2 text-gray-600"><span class="font-semibold">Megjegyzés:</span> ${o.notes}</p>` : ''}
- <button data-id="${docId}" class="delete-btn mt-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Törlés</button>
-        </div>
+          <button data-id="${docId}" class="delete-btn mt-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Törlés</button>
         </div>
       `;
 
       container.appendChild(card);
     });
 
-  } catch (error) {
-    console.error('Hiba a munkalapok betöltésekor:', error);
-    container.innerHTML = '<p class="text-red-600">Hiba történt az adatok betöltésekor.</p>';
-  }
-}
-
- document.querySelectorAll('.delete-btn').forEach(btn => {
+    // Törlés gomb esemény
+    document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.target.getAttribute('data-id');
         if (confirm('Biztosan törlöd ezt a munkalapot?')) {
