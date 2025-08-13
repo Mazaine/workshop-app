@@ -12,6 +12,17 @@ body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
 .card {
   background: white;
   padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0.5rem;@media (min-width: 768px) {
+  #menu-links {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #menu-links {
+    display: none;
+  }
+}
+
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
 }
