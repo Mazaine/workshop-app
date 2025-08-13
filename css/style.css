@@ -1,33 +1,44 @@
-/* css/style.css - egyszerű kiegészítők */
-body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-     Roboto, "Helvetica Neue", Arial; 
-    background-color: rgb(240, 233, 233);}
-.card { display:flex; align-items:center; justify-content:center; min-height:110px; }
-#order-cards-container {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.card {
-  background: white;
-  padding: 1rem;
-  border-radius: 0.5rem;@media (min-width: 768px) {
-  #menu-links {
-    display: flex !important;
-  }
+/* Alap beállítások */
+body {
+  margin: 0;
+  font-family: sans-serif;
 }
 
-@media (min-width: 768px) {
-  #menu-links {
-    display: flex !important;
-    max-height: none !important;
-  }
+/* Globális konténer: hogy a tartalom ne tapadjon a széléhez */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
+/* Képek mindig illeszkedjenek */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mobilbarát gombok */
+button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Navigációs menü mobilra */
 @media (max-width: 767px) {
-  #menu-links {
-    display: flex;
-    flex-direction: column;
+  nav h1 {
+    font-size: 1.25rem;
+  }
+
+  nav button {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Asztali nézet */
+@media (min-width: 768px) {
+  nav button {
+    margin: 0;
   }
 }
