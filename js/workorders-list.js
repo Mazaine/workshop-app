@@ -59,5 +59,5 @@ container.innerHTML = '<p class="text-red-600">Hiba történt az adatok betölt�
 
 document.addEventListener('DOMContentLoaded', loadWorkOrders);
 
-Kérek egy törlés gombot ami kitölti az adatbazisbol
+
 
