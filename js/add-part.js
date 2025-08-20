@@ -10,6 +10,7 @@ if (addPartForm) {
 
     const partName = document.getElementById('part-name').value.trim();
     const partType = document.getElementById('part-type').value;
+    const partPurchasePrice = document.getElementById('part-purchase-price').value;
     const partPrice = parseInt(document.getElementById('part-price').value) || 0;
     const partQuantity = parseInt(document.getElementById('part-quantity').value) || 0;
 
@@ -17,6 +18,7 @@ if (addPartForm) {
       await addDoc(collection(firestore, "parts"), {
         name: partName,
         type: partType,
+        purchasePrice: partPurchasePrice,
         price: partPrice,
         quantity: partQuantity
       });

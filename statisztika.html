@@ -1,357 +1,42 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Egér alkatrész kezelő - Profit Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .profit-positive {
-            color: #10B981;
-        }
-        .profit-negative {
-            color: #EF4444;
-        }
-        .status-paid {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-        .status-repaired {
-            background-color: #DBEAFE;
-            color: #1E40AF;
-        }
-        .status-shipping {
-            background-color: #FEF3C7;
-            color: #92400E;
-        }
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 250px !important;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Statisztika</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="./statisztika.js"></script>
+<style>
+body { font-family: sans-serif; margin: 20px; }
+.container { max-width: 1200px; margin: auto; }
+.filter { margin-bottom: 20px; }
+.chart-container { width: 100%; height: 400px; margin-bottom: 40px; }
+.summary { display: flex; gap: 20px; margin-bottom: 20px; }
+.summary div { padding: 10px; background: #f3f3f3; border-radius: 6px; flex: 1; text-align: center; }
+</style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <div class="container mx-auto px-4 py-6">
-        <!-- Fejléc -->
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Egér alkatrész kezelő - Profit Dashboard</h1>
-            <p class="text-gray-600">Utolsó frissítés: <span id="last-update">2023.11.15 14:30</span></p>
-        </header>
+<body>
+<div class="container">
+    <h1>Statisztika</h1>
 
-        <!-- Fő összesítő számok (Top bar) -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500 text-sm">Összes bevétel</p>
-                        <h3 class="text-2xl font-bold">1,245,000 Ft</h3>
-                    </div>
-                    <div class="bg-blue-100 p-3 rounded-full">
-                        <i class="fas fa-money-bill-wave text-blue-500 text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-green-500 text-sm mt-2"><i class="fas fa-arrow-up"></i> 12% az előző hónaphoz képest</p>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500 text-sm">Összes költség</p>
-                        <h3 class="text-2xl font-bold">875,000 Ft</h3>
-                    </div>
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <i class="fas fa-shopping-cart text-red-500 text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-red-500 text-sm mt-2"><i class="fas fa-arrow-up"></i> 8% az előző hónaphoz képest</p>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500 text-sm">Összes profit</p>
-                        <h3 class="text-2xl font-bold profit-positive">370,000 Ft</h3>
-                    </div>
-                    <div class="bg-green-100 p-3 rounded-full">
-                        <i class="fas fa-chart-line text-green-500 text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-green-500 text-sm mt-2"><i class="fas fa-arrow-up"></i> 18% az előző hónaphoz képest</p>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-500">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500 text-sm">Napi/Heti/Havi</p>
-                        <div class="flex space-x-2 mt-1">
-                            <span class="text-green-500"><i class="fas fa-circle"></i> 12,500 Ft</span>
-                            <span class="text-blue-500"><i class="fas fa-circle"></i> 87,500 Ft</span>
-                            <span class="text-purple-500"><i class="fas fa-circle"></i> 370,000 Ft</span>
-                        </div>
-                    </div>
-                    <div class="bg-purple-100 p-3 rounded-full">
-                        <i class="fas fa-calendar-alt text-purple-500 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Időszak bontás és grafikon -->
-        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-2 md:mb-0">Profit trendek</h2>
-                <div class="flex space-x-2">
-                    <button id="daily-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md">Napi</button>
-                    <button id="weekly-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Heti</button>
-                    <button id="monthly-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Havi</button>
-                </div>
-            </div>
-            
-            <div class="chart-container" style="height: 300px;">
-                <canvas id="profitChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Alkatrész és munka bontás -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-4">Legprofitálóbb alkatrész</h3>
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-microchip text-blue-500"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium">Optikai érzékelő</p>
-                        <p class="text-green-500 text-sm">+82,400 Ft profit</p>
-                    </div>
-                </div>
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-plug text-blue-500"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium">USB kábel</p>
-                        <p class="text-green-500 text-sm">+45,200 Ft profit</p>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-mouse text-blue-500"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium">Gombok</p>
-                        <p class="text-green-500 text-sm">+32,100 Ft profit</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-4">Leggyakrabban használt alkatrész</h3>
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-plug text-purple-500"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium">USB kábel</p>
-                        <p class="text-gray-600 text-sm">56 alkalommal</p>
-                    </div>
-                </div>
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-battery-half text-purple-500"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium">Akkumulátor</p>
-                        <p class="text-gray-600 text-sm">42 alkalommal</p>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-mouse text-purple-500"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium">Gombok</p>
-                        <p class="text-gray-600 text-sm">38 alkalommal</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-4">Profit megoszlás</h3>
-                <div class="chart-container" style="height: 200px;">
-                    <canvas id="distributionChart"></canvas>
-                </div>
-                <div class="mt-4">
-                    <div class="flex justify-between mb-1">
-                        <span class="text-sm text-gray-600">Alkatrész profit</span>
-                        <span class="text-sm font-medium">63%</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-gray-600">Munka díj</span>
-                        <span class="text-sm font-medium">37%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Extra összesítők -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-2">Átlag profit per munkalap</h3>
-                <p class="text-2xl font-bold text-green-500">8,750 Ft</p>
-                <p class="text-gray-500 text-sm mt-1">Összesen 42 munkalap</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-2">Összes elvégzett munka</h3>
-                <p class="text-2xl font-bold">42</p>
-                <p class="text-gray-500 text-sm mt-1">Ebből 12 új ügyfél</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-2">Státusz szerinti bontás</h3>
-                <div class="flex space-x-2 mt-2">
-                    <span class="px-2 py-1 rounded-full status-paid text-xs">Fizetve (24)</span>
-                    <span class="px-2 py-1 rounded-full status-repaired text-xs">Javítva (14)</span>
-                    <span class="px-2 py-1 rounded-full status-shipping text-xs">Szállítás alatt (4)</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Részletes lista / tábla -->
-        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-2 md:mb-0">Munkalapok részletes listája</h2>
-                <div class="flex space-x-2">
-                    <div class="relative">
-                        <select class="block appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                            <option>Szűrés státusz szerint</option>
-                            <option>Fizetve</option>
-                            <option>Javítva</option>
-                            <option>Szállítás alatt</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                    </div>
-                    <button class="px-4 py-2 bg-green-500 text-white rounded-md flex items-center">
-                        <i class="fas fa-file-export mr-2"></i> Exportálás
-                    </button>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dátum</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Munkalap név</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alkatrész</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mennyiség</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beszerzési ár</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Egységár</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Munka díj</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Státusz</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023.11.14</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#JAV-231114-001</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Optikai érzékelő</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4,200 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8,500 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5,000 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium profit-positive">9,300 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 rounded-full status-paid text-xs">Fizetve</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023.11.13</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#JAV-231113-002</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">USB kábel</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,800 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3,500 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3,000 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium profit-positive">7,200 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 rounded-full status-repaired text-xs">Javítva</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023.11.12</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#JAV-231112-003</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gombok</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,400 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4,800 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4,500 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium profit-positive">6,900 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 rounded-full status-shipping text-xs">Szállítás alatt</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023.11.10</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#JAV-231110-004</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Akkumulátor</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3,500 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6,000 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3,500 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium profit-positive">6,000 Ft</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 rounded-full status-paid text-xs">Fizetve</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="filter">
+        <label>Dátum kezdete: <input type="date" id="startDate"></label>
+        <label>Dátum vége: <input type="date" id="endDate"></label>
+        <button id="filterBtn">Szűrés</button>
     </div>
 
-    <script>
-        // Profit trend grafikon
-        const profitCtx = document.getElementById('profitChart').getContext('2d');
-        const profitChart = new Chart(profitCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'],
-                datasets: [
-                    {
-                        label: 'Alkatrész profit',
-                        data: [12000, 19000, 15000, 22000, 18000, 10000, 5000],
-                        backgroundColor: '#3B82F6',
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Munka profit',
-                        data: [8000, 11000, 9000, 12000, 10000, 6000, 2000],
-                        backgroundColor: '#10B981',
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value + ' Ft';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.raw + ' Ft';
+    <div class="summary">
+        <div id="totalProfit">Profit: 0 Ft</div>
+        <div id="totalCost">Kiadás: 0 Ft</div>
+        <div id="mostUsedPart">Legtöbbet használt alkatrész: -</div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="profitChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="distributionChart"></canvas>
+    </div>
+</div>
+</body>
+</html>

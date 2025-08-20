@@ -17,6 +17,7 @@ document.write(`
         <button onclick="window.location.href='order.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Rendelések</button>
         <button onclick="window.location.href='create-workorder.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Munkalap generálása</button>
         <button onclick="window.location.href='workorders-list.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Munkalapok</button>
+        <button onclick="window.location.href='statisztika.html'" class="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800">Statisztika</button>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { firestore } from './firebase.js';
-import { collection, getDocs, query, orderBy, deleteDoc, doc } 
+import { collection, getDocs, query, orderBy, doc, updateDoc } 
   from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 async function loadWorkOrders() {
@@ -7,7 +7,6 @@ async function loadWorkOrders() {
   if (!container) return;
 
   try {
-    // Próbálunk dátum szerint rendezni, ha nincs createdAt mező, akkor simán lekérjük
     let q;
     try {
       q = query(collection(firestore, 'workOrders'), orderBy('createdAt'));
@@ -21,12 +20,19 @@ async function loadWorkOrders() {
     querySnapshot.forEach(docSnap => {
       const o = docSnap.data();
 
+      if (o.deleted) return; // ha soft delete, nem mutatjuk
+
       const card = document.createElement('div');
       card.className = 'bg-white rounded-lg shadow-md overflow-hidden mb-4';
 
-      const formattedDate = o.date
-        ? new Date(o.date.seconds * 1000).toLocaleDateString('hu-HU')
-        : 'Nincs dátum';
+      let formattedDate = 'Nincs dátum';
+      if (o.date) {
+        if (o.date.seconds !== undefined) {
+          formattedDate = o.date.toDate().toLocaleDateString('hu-HU');
+        } else {
+          formattedDate = new Date(o.date).toLocaleDateString('hu-HU');
+        }
+      }
 
       let partsHtml = '';
       if (o.partsUsed && o.partsUsed.length) {
@@ -61,13 +67,14 @@ async function loadWorkOrders() {
       container.appendChild(card);
     });
 
-    // Törlés gombok eseménykezelője
+    // Soft delete gomb eseménykezelő
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.target.getAttribute('data-id');
         if (confirm('Biztosan törölni szeretnéd ezt a munkalapot?')) {
-          await deleteDoc(doc(firestore, 'workOrders', id));
-          loadWorkOrders(); // Lista újratöltése
+          const workOrderRef = doc(firestore, 'workOrders', id);
+          await updateDoc(workOrderRef, { deleted: true });
+          loadWorkOrders();
         }
       });
     });

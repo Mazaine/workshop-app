@@ -194,6 +194,11 @@ if (woForm) {
     const laborCost = parseInt(document.getElementById('labor-cost').value) || 0;
     const serviceFee = parseInt(document.getElementById('service-fee').value) || 0;
     const date = document.getElementById('date').value;
+    const performedWorks = [];
+    document.querySelectorAll('#performed-works .work-checkbox:checked').forEach(cb => {
+    performedWorks.push(cb.value);
+});
+
     const notes = document.getElementById('notes').value.trim();
 
     if (selectedParts.size === 0) {
@@ -227,6 +232,7 @@ if (woForm) {
       await addDoc(workOrdersCol, {
         issueDescription, customerName, name, contact, device,
         laborCost, serviceFee, date, notes,
+        performedWorks, 
         partsUsed, totalPartsCost, total,
         createdAt: serverTimestamp(),
         status: 'Új'
