@@ -215,7 +215,7 @@ if (woForm) {
         const qty = item.quantity || 0;
         const price = item.price || 0;
 
-        partsUsed.push({ partId: id, quantity: qty, price });
+        partsUsed.push({ partId: id, name: item.name, quantity: qty, price });
         totalPartsCost += qty * price;
 
         // Készlet levonása (egyszerű update)
