@@ -9,9 +9,9 @@ async function loadWorkOrders() {
   try {
     let q;
     try {
-      q = query(collection(firestore, 'workOrders'), orderBy('createdAt'));
+      q = query(collection(firestore, 'worksheets'), orderBy('createdAt'));
     } catch {
-      q = query(collection(firestore, 'workOrders'));
+      q = query(collection(firestore, 'worksheets'));
     }
 
     const querySnapshot = await getDocs(q);
@@ -19,46 +19,45 @@ async function loadWorkOrders() {
 
     querySnapshot.forEach(docSnap => {
       const o = docSnap.data();
-
       if (o.deleted) return; // ha soft delete, nem mutatjuk
 
       const card = document.createElement('div');
       card.className = 'bg-white rounded-lg shadow-md overflow-hidden mb-4';
 
+      // Dátum
       let formattedDate = 'Nincs dátum';
-      if (o.date) {
-        if (o.date.seconds !== undefined) {
-          formattedDate = o.date.toDate().toLocaleDateString('hu-HU');
-        } else {
-          formattedDate = new Date(o.date).toLocaleDateString('hu-HU');
-        }
+      if (o.repairDate) {
+        formattedDate = new Date(o.repairDate).toLocaleDateString('hu-HU');
       }
 
-     let partsHtml = '';
-if (o.usedParts && o.usedParts.length) {
-  partsHtml = '<div class="mt-2"><p class="font-semibold">Felhasznált alkatrészek:</p><ul class="list-disc list-inside">';
-  o.usedParts.forEach(p => {
-    partsHtml += `<li>${p.partName || 'Név hiányzik'} – ${p.kit || 0} db (${p.price || 0} Ft/db) = ${(p.kit || 0) * (p.price || 0)} Ft</li>`;
-  });
-  partsHtml += '</ul></div>';
-}
+      // Felhasznált alkatrészek
+      let partsHtml = '';
+      if (o.usedParts && o.usedParts.length) {
+        partsHtml = '<div class="mt-2"><p class="font-semibold">Felhasznált alkatrészek:</p><ul class="list-disc list-inside">';
+        o.usedParts.forEach(p => {
+          partsHtml += `<li>${p.partName || 'Név hiányzik'} – ${p.kit || 0} db (${p.price || 0} Ft/db) = ${(p.kit || 0) * (p.price || 0)} Ft</li>`;
+        });
+        partsHtml += '</ul></div>';
+      }
 
+      // Összes alkatrészköltség
+      const totalPartsCost = o.usedParts?.reduce((sum, p) => sum + (p.kit || 0) * (p.price || 0), 0) || 0;
 
       card.innerHTML = `
         <div class="p-4">
-          <h3 class="text-xl font-bold mb-2">${o.device || 'Ismeretlen eszköz'}</h3>
-          <p class="text-gray-600 mb-1"><span class="font-semibold">Ügyfél:</span> ${o.customerName || ''}</p>
-          <p class="text-gray-600 mb-1"><span class="font-semibold">Elérhetőség:</span> ${o.contact || ''}</p>
+          <h3 class="text-xl font-bold mb-2">${o.deviceToRepair || 'Ismeretlen eszköz'}</h3>
+          <p class="text-gray-600 mb-1"><span class="font-semibold">Ügyfél:</span> ${o.simpleCustomerName || o.customerName || ''}</p>
+          <p class="text-gray-600 mb-1"><span class="font-semibold">Elérhetőség:</span> ${o.contactInfo || ''}</p>
           <p class="text-gray-600 mb-1"><span class="font-semibold">Dátum:</span> ${formattedDate}</p>
-          <p class="text-gray-600 mb-2"><span class="font-semibold">Hiba:</span> ${o.issueDescription || ''}</p>
+          <p class="text-gray-600 mb-2"><span class="font-semibold">Hiba:</span> ${o.errorReason || ''}</p>
           ${partsHtml}
           <div class="mt-4 border-t pt-2">
-            <p class="text-gray-600"><span class="font-semibold">Alkatrészek összesen:</span> ${o.totalPartsCost || 0} Ft</p>
-            <p class="text-gray-600"><span class="font-semibold">Munkadíj:</span> ${o.laborCost || 0} Ft</p>
-            <p class="text-gray-600"><span class="font-semibold">Szervízdíj:</span> ${o.serviceFee || 0} Ft</p>
-            <p class="text-lg font-bold text-blue-600 mt-1"><span class="font-semibold">Összesen:</span> ${o.total || 0} Ft</p>
+            <p class="text-gray-600"><span class="font-semibold">Alkatrészek összesen:</span> ${totalPartsCost} Ft</p>
+            <p class="text-gray-600"><span class="font-semibold">Munkadíj:</span> ${o.munkadij || 0} Ft</p>
+            <p class="text-gray-600"><span class="font-semibold">Szervízdíj:</span> ${o.szervizdij || 0} Ft</p>
+            <p class="text-lg font-bold text-blue-600 mt-1"><span class="font-semibold">Összesen:</span> ${totalPartsCost + (o.munkadij || 0) + (o.szervizdij || 0)} Ft</p>
           </div>
-          ${o.notes ? `<p class="mt-2 text-gray-600"><span class="font-semibold">Megjegyzés:</span> ${o.notes}</p>` : ''}
+          ${o.comment ? `<p class="mt-2 text-gray-600"><span class="font-semibold">Megjegyzés:</span> ${o.comment}</p>` : ''}
           <button data-id="${docSnap.id}" class="delete-btn mt-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
             Törlés
           </button>
@@ -73,8 +72,8 @@ if (o.usedParts && o.usedParts.length) {
       btn.addEventListener('click', async (e) => {
         const id = e.target.getAttribute('data-id');
         if (confirm('Biztosan törölni szeretnéd ezt a munkalapot?')) {
-          const workOrderRef = doc(firestore, 'workOrders', id);
-          await updateDoc(workOrderRef, { deleted: true });
+          const wsRef = doc(firestore, 'worksheets', id);
+          await updateDoc(wsRef, { deleted: true });
           loadWorkOrders();
         }
       });
