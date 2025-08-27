@@ -38,8 +38,8 @@ async function loadWorkOrders() {
       if (o.partsUsed && o.partsUsed.length) {
         partsHtml = '<div class="mt-2"><p class="font-semibold">Felhasznált alkatrészek:</p><ul class="list-disc list-inside">';
         o.partsUsed.forEach(p => {
-          partsHtml += `<li>${p.name}${p.quantity} db (${p.price} Ft/db) = ${p.quantity * p.price} Ft</li>`;
-        });
+         partsHtml += `<li>${p.name} – ${p.quantity} db (${p.price} Ft/db) = ${p.quantity * p.price} Ft</li>`;
+});
         partsHtml += '</ul></div>';
       }
 
