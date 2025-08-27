@@ -1,22 +1,41 @@
-import { getWorksheets, getParts } from './firebase.js';
+// statisztika.js
+import { firestore } from './firebase.js';
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-const profitCtx = document.getElementById('profitChart').getContext('2d');
-const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+// Canvas elem
+const distributionCtx = document.getElementById('distributionChart')?.getContext('2d');
+if (!distributionCtx) {
+    console.error("distributionChart canvas nem található!");
+}
 
-const profitChart = new Chart(profitCtx, {
-    type: 'bar',
-    data: { labels: [], datasets: [{ label: 'Profit', data: [], backgroundColor: '#3B82F6' }] },
-    options: { responsive: true, maintainAspectRatio: false }
-});
-
+// Doughnut chart
 const distributionChart = new Chart(distributionCtx, {
     type: 'doughnut',
     data: { labels: ['Profit', 'Kiadás'], datasets: [{ data: [0,0], backgroundColor: ['#3B82F6', '#EF4444'] }] },
     options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
 });
 
-async function loadStats(startDate=null, endDate=null) {
-    const worksheets = await getWorksheets(startDate, endDate);
+// Worksheets lekérése
+async function getWorksheets() {
+    const snap = await getDocs(collection(firestore, 'worksheets'));
+    const data = [];
+    snap.forEach(doc => data.push(doc.data())); // minden dokumentumot beteszünk
+    console.log("Worksheets:", data);
+    return data;
+}
+
+// Parts lekérése
+async function getParts() {
+    const snap = await getDocs(collection(firestore, 'parts'));
+    const data = {};
+    snap.forEach(doc => data[doc.id] = doc.data());
+    console.log("Parts:", data);
+    return data;
+}
+
+// Statisztika betöltése
+async function loadStats() {
+    const worksheets = await getWorksheets();
     const partsData = await getParts();
 
     let totalProfit = 0;
@@ -24,14 +43,13 @@ async function loadStats(startDate=null, endDate=null) {
     const partUsage = {};
 
     worksheets.forEach(ws => {
-        if (ws.usedParts) {
-            ws.usedParts.forEach(p => {
+        totalProfit += ws.total || 0;
+
+        if(ws.partsUsed){
+            ws.partsUsed.forEach(p => {
                 const part = partsData[p.partId];
-                if (part) {
-                    const profit = (p.unitPrice - part.cost) * p.quantity;
-                    totalProfit += profit;
-                    totalCost += part.cost * p.quantity;
-                    
+                if(part){
+                    totalCost += (part.purchasePrice || 0) * p.quantity;
                     partUsage[part.name] = (partUsage[part.name] || 0) + p.quantity;
                 }
             });
@@ -40,32 +58,20 @@ async function loadStats(startDate=null, endDate=null) {
 
     const mostUsedPart = Object.entries(partUsage).sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
 
+    // DOM frissítés
     document.getElementById('totalProfit').innerText = `Profit: ${totalProfit} Ft`;
     document.getElementById('totalCost').innerText = `Kiadás: ${totalCost} Ft`;
-    document.getElementById('mostUsedPart').innerText = `Legtöbbet használt alkatrész: ${mostUsedPart}`;
+    document.getElementById('mostUsedPart').innerText = ` ${mostUsedPart}`;
 
-    // Diagram adatok
-    profitChart.data.labels = worksheets.map(ws => ws.date);
-    profitChart.data.datasets[0].data = worksheets.map(ws => {
-        let profit = 0;
-        if (ws.usedParts) {
-            ws.usedParts.forEach(p => {
-                const part = partsData[p.partId];
-                if (part) profit += (p.unitPrice - part.cost) * p.quantity;
-            });
-        }
-        return profit;
-    });
-    profitChart.update();
-
+    // Doughnut frissítése
     distributionChart.data.datasets[0].data = [totalProfit, totalCost];
     distributionChart.update();
 }
 
+// Szűrő gomb (egyszerűsített, dátumszűrés nélkül)
 document.getElementById('filterBtn').addEventListener('click', () => {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    loadStats(startDate, endDate);
+    loadStats();
 });
 
+// Betöltés
 loadStats();
