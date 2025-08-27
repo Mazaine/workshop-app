@@ -4,39 +4,56 @@
 <meta charset="UTF-8">
 <title>Statisztika</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="module" src="./statisztika.js"></script>
-<style>
-body { font-family: sans-serif; margin: 20px; }
-.container { max-width: 1200px; margin: auto; }
-.filter { margin-bottom: 20px; }
-.chart-container { width: 100%; height: 400px; margin-bottom: 40px; }
-.summary { display: flex; gap: 20px; margin-bottom: 20px; }
-.summary div { padding: 10px; background: #f3f3f3; border-radius: 6px; flex: 1; text-align: center; }
-</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="./js/navbar.js"></script>
+<link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
-<div class="container">
-    <h1>Statisztika</h1>
+<body class="bg-gray-50 font-sans text-gray-800">
+<div class="container mx-auto p-6">
 
-    <div class="filter">
-        <label>Dátum kezdete: <input type="date" id="startDate"></label>
-        <label>Dátum vége: <input type="date" id="endDate"></label>
-        <button id="filterBtn">Szűrés</button>
+    <h1 class="text-3xl font-bold mb-6 text-center">Statisztika</h1>
+
+    <!-- Szűrő -->
+    <div class="flex flex-wrap gap-4 items-center mb-8 justify-center">
+        <div>
+            <label class="block font-medium mb-1">Dátum kezdete:</label>
+            <input type="date" id="startDate" class="border rounded px-3 py-2">
+        </div>
+        <div>
+            <label class="block font-medium mb-1">Dátum vége:</label>
+            <input type="date" id="endDate" class="border rounded px-3 py-2">
+        </div>
+        <button id="filterBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            Szűrés
+        </button>
     </div>
 
-    <div class="summary">
-        <div id="totalProfit">Profit: 0 Ft</div>
-        <div id="totalCost">Kiadás: 0 Ft</div>
-        <div id="mostUsedPart">Legtöbbet használt alkatrész: -</div>
+    <!-- Összegző panelek -->
+    <div class="flex flex-wrap gap-4 mb-8">
+        <div class="bg-white shadow rounded p-4 flex-1 text-center">
+            <p class="font-semibold text-lg">Profit</p>
+            <p id="totalProfit" class="text-xl mt-2">0 Ft</p>
+        </div>
+        <div class="bg-white shadow rounded p-4 flex-1 text-center">
+            <p class="font-semibold text-lg">Kiadás</p>
+            <p id="totalCost" class="text-xl mt-2">0 Ft</p>
+        </div>
+        <div class="bg-white shadow rounded p-4 flex-1 text-center">
+            <p class="font-semibold text-lg">Legtöbbet használt alkatrész</p>
+            <p id="mostUsedPart" class="text-xl mt-2">-</p>
+        </div>
     </div>
 
-    <div class="chart-container">
-        <canvas id="profitChart"></canvas>
-    </div>
+    <!-- Grafikonok -->
+    
 
-    <div class="chart-container">
-        <canvas id="distributionChart"></canvas>
-    </div>
+   <div class="bg-white shadow rounded p-4 mb-8 max-w-md mx-auto" style="height: 250px;">
+    <h2 class="text-lg font-semibold mb-2 text-center">Alkatrész eloszlás</h2>
+    <canvas id="distributionChart" class="w-full h-full"></canvas>
 </div>
+
+
+
+<script type="module" src="./js/statisztika.js"></script>
 </body>
 </html>
