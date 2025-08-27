@@ -34,14 +34,15 @@ async function loadWorkOrders() {
         }
       }
 
-      let partsHtml = '';
-      if (o.partsUsed && o.partsUsed.length) {
-        partsHtml = '<div class="mt-2"><p class="font-semibold">Felhasznált alkatrészek:</p><ul class="list-disc list-inside">';
-        o.partsUsed.forEach(p => {
-         partsHtml += `<li>${p.partName || 'Név hiányzik'} – ${p.kit || 0} db (${p.price || 0} Ft/db) = ${(p.kit || 0) * (p.price || 0)} Ft</li>`;
-});
-        partsHtml += '</ul></div>';
-      }
+     let partsHtml = '';
+if (o.usedParts && o.usedParts.length) {
+  partsHtml = '<div class="mt-2"><p class="font-semibold">Felhasznált alkatrészek:</p><ul class="list-disc list-inside">';
+  o.usedParts.forEach(p => {
+    partsHtml += `<li>${p.partName || 'Név hiányzik'} – ${p.kit || 0} db (${p.price || 0} Ft/db) = ${(p.kit || 0) * (p.price || 0)} Ft</li>`;
+  });
+  partsHtml += '</ul></div>';
+}
+
 
       card.innerHTML = `
         <div class="p-4">
