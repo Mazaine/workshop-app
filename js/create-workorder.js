@@ -9,9 +9,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // Globális tárolók
-const partsMap = new Map();      // id -> {id, name, price, quantity, ...}
+const partsMap = new Map();      // id -> {id, name, price, quantity, tipus, ...}
 const selectedParts = new Map(); // id -> {id, name, price, quantity}
 
+// Alkatrészek betöltése
 async function loadParts() {
   try {
     const partsCol = collection(firestore, 'parts');
@@ -27,7 +28,6 @@ async function loadParts() {
 function populatePartSelect() {
   const select = document.getElementById('part-select');
   if (!select) return;
-  // töröljük a régi opciókat (az első placeholdert meghagyjuk)
   while (select.options.length > 1) select.remove(1);
 
   for (const [id, p] of partsMap) {
@@ -38,6 +38,7 @@ function populatePartSelect() {
   }
 }
 
+// Kiválasztott alkatrészek megjelenítése
 function renderSelectedParts() {
   const container = document.getElementById('selected-parts-list');
   container.innerHTML = '';
@@ -101,7 +102,7 @@ function renderSelectedParts() {
 
     tbody.appendChild(tr);
 
-    // események: input változás + gombok
+    // Események
     const input = qtyTd.querySelector(`input[data-id="${id}"]`);
     input.addEventListener('change', (e) => {
       let v = parseInt(e.target.value) || 1;
@@ -134,15 +135,14 @@ function renderSelectedParts() {
   container.appendChild(table);
 }
 
+// DOM betöltés
 document.addEventListener('DOMContentLoaded', () => {
-  // betöltjük az alkatrészeket egyszer
   loadParts();
 
-  // qty +/- gombok az input sorban
+  // qty +/- gombok
   const qtyInc = document.getElementById('qty-increase');
   const qtyDec = document.getElementById('qty-decrease');
   const qtyInput = document.getElementById('part-quantity');
-
   qtyInc?.addEventListener('click', () => { qtyInput.value = (parseInt(qtyInput.value) || 1) + 1; });
   qtyDec?.addEventListener('click', () => { qtyInput.value = Math.max(1, (parseInt(qtyInput.value) || 1) - 1); });
 
@@ -151,18 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
   addBtn?.addEventListener('click', () => {
     const select = document.getElementById('part-select');
     const qty = Math.max(1, parseInt(document.getElementById('part-quantity').value) || 1);
-
-    if (!select || !select.value) {
-      alert('Kérlek válassz alkatrészt!');
-      return;
-    }
+    if (!select || !select.value) { alert('Kérlek válassz alkatrészt!'); return; }
 
     const partId = select.value;
     const p = partsMap.get(partId);
-    if (!p) {
-      alert('Az alkatrész nem található (frissítsd az oldalt).');
-      return;
-    }
+    if (!p) { alert('Az alkatrész nem található (frissítsd az oldalt).'); return; }
 
     if (selectedParts.has(partId)) {
       const existing = selectedParts.get(partId);
@@ -172,68 +165,68 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedParts.set(partId, { id: partId, name: p.name, price: p.price || 0, quantity: qty });
     }
 
-    // visszaállítjuk a választót és qty-t gyors további hozzáadáshoz
     select.value = '';
     document.getElementById('part-quantity').value = 1;
-
     renderSelectedParts();
   });
 });
 
-// Űrlap beküldése — itt történik a munkalap mentése és a készlet frissítése
+// Űrlap beküldés
 const woForm = document.getElementById('workorder-form');
 if (woForm) {
   woForm.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const issueDescription = document.getElementById('issue-description').value.trim();
-    const customerName = document.getElementById('customer-name').value.trim();
-    const name = document.getElementById('name').value.trim();
-    const contact = document.getElementById('contact').value.trim();
     const device = document.getElementById('device').value.trim();
-    const laborCost = parseInt(document.getElementById('labor-cost').value) || 0;
-    const serviceFee = parseInt(document.getElementById('service-fee').value) || 0;
-    const date = document.getElementById('date').value;
+    const customerName = document.getElementById('customer-name').value.trim();
+    const simpleCustomerName = document.getElementById('name').value.trim();
+    const contactInfo = document.getElementById('contact').value.trim();
+    const repairDate = document.getElementById('date').value;
+    const errorReason = document.getElementById('issue-description').value.trim();
+    const munkadij = parseInt(document.getElementById('labor-cost').value) || 0;
+    const szervizdij = parseInt(document.getElementById('service-fee').value) || 0;
+    const comment = document.getElementById('notes').value.trim();
     const performedWorks = [];
-    document.querySelectorAll('#performed-works .work-checkbox:checked').forEach(cb => {
-    performedWorks.push(cb.value);
-});
+    document.querySelectorAll('#performed-works .work-checkbox:checked').forEach(cb => performedWorks.push(cb.value));
 
-    const notes = document.getElementById('notes').value.trim();
+    if (selectedParts.size === 0 && !confirm('Nincs kiválasztott alkatrész. Folytatod munkalap mentését?')) return;
 
-    if (selectedParts.size === 0) {
-      if (!confirm('Nincs kiválasztott alkatrész. Folytatod munkalap mentését?')) return;
-    }
-
-    const partsUsed = [];
     let totalPartsCost = 0;
+    const usedParts = Array.from(selectedParts, ([id, item]) => {
+      const p = partsMap.get(id);
+      totalPartsCost += (item.quantity || 0) * (item.price || 0);
+      return {
+        partName: item.name,
+        kit: item.quantity,
+        price: item.price,
+        tipus: p?.tipus || ''
+      };
+    });
 
     try {
-      // Frissítjük a készletet az aktuálisan betöltött partsMap alapján
+      // Készlet frissítése
       for (const [id, item] of selectedParts) {
         const p = partsMap.get(id);
-        const qty = item.quantity || 0;
-        const price = item.price || 0;
-
-        partsUsed.push({ partId: id, name: item.name, quantity: qty, price });
-        totalPartsCost += qty * price;
-
-        // Készlet levonása (egyszerű update)
         const partDocRef = doc(firestore, 'parts', id);
-        await updateDoc(partDocRef, {
-          quantity: Math.max(0, (p.quantity || 0) - qty)
-        });
+        await updateDoc(partDocRef, { quantity: Math.max(0, (p.quantity || 0) - (item.quantity || 0)) });
       }
 
-      const total = totalPartsCost + laborCost + serviceFee;
-
-      // Mentjük a munkalapot
-      const workOrdersCol = collection(firestore, 'workOrders');
+      // Munkalap mentése
+      const workOrdersCol = collection(firestore, 'worksheets');
       await addDoc(workOrdersCol, {
-        issueDescription, customerName, name, contact, device,
-        laborCost, serviceFee, date, notes,
-        performedWorks, 
-        partsUsed, totalPartsCost, total,
+        deviceToRepair: device,
+        customerName,
+        simpleCustomerName,
+        contactInfo,
+        repairDate,
+        errorReason,
+        munkadij,
+        szervizdij,
+        comment,
+        performedWorks,
+        usedParts,
+        totalPartsCost,
+        total: totalPartsCost + munkadij + szervizdij,
         createdAt: serverTimestamp(),
         status: 'Új'
       });
@@ -242,9 +235,10 @@ if (woForm) {
       woForm.reset();
       selectedParts.clear();
       renderSelectedParts();
-      await loadParts(); // frissítjük a helyi partsMap-ot (készlet változhatott)
-    } catch (error) {
-      console.error('Hiba mentéskor:', error);
+      await loadParts();
+
+    } catch (err) {
+      console.error('Hiba mentéskor:', err);
       alert('Hiba történt a munkalap mentésekor!');
     }
   });
